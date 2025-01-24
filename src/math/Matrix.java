@@ -1,5 +1,6 @@
 package math;
 
-public class Matrix {
+import java.util.ArrayList;
 
+public class Matrix extends JMathObject {
 }

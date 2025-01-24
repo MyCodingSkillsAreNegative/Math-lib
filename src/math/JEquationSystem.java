@@ -1,5 +1,4 @@
 package math;
 
-public class JEquationSystem {
-
+public class JEquationSystem extends JMathObject {
 }

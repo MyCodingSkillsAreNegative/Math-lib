@@ -1,5 +1,4 @@
 package math;
 
-public class JExpression {
-
+public class JExpression extends JMathObject {
 }

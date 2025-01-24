@@ -1,5 +1,4 @@
 package math;
 
-public class JVariable {
-
+public class JVariable extends JConstant{
 }

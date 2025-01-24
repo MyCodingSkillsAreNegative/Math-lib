@@ -1,5 +1,6 @@
 package math;
 
-public class JVector {
+import java.util.ArrayList;
 
+public class JVector extends JMathObject {
 }
