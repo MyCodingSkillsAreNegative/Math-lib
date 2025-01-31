@@ -109,7 +109,6 @@ public class JsonElement {
 			arrtag = "\"" + this.Name + "\":[" + this.strOfContents() + "]";
 			return arrtag;
 		default:
-			System.out.println("JsonElement.java | getTagValue()  :  This is only a testing function as of now. Doesn't support container elements");
 			return "A";
 		}
 	}
@@ -136,12 +135,10 @@ public class JsonElement {
 		return parent;
 	}
 	public JsonElement surfaceSearch(String surfaceIDTag) {
-		System.out.println("SurfaceID TAG" + surfaceIDTag);
 		if (surfaceIDTag == this.Name) {
 			return this;
 		}
 		for (JsonElement i : this.secValue) {
-			System.out.println("NAME: "  + i.Name);
 			if (i.Name == surfaceIDTag) {
 				return i;
 			}
@@ -149,14 +146,11 @@ public class JsonElement {
 		return new JsonElement("NOT FOUND", "NOT FOUND");
 	}
 	private JsonElement SufacefromString(String objID) {
-		System.out.println(this.secValue.size());
 		if (this.toString().equals(objID)) {
 			return this;
 		}
 		for (JsonElement i : this.secValue) {
-			System.out.println("SURFACE STRING CONT:" + i.Name + "," + i.toString());
 			if (i.toString().equals(objID)) {
-				System.out.println("RETURNED");
 				return i;
 			}
 		}

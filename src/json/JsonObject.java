@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -22,34 +23,41 @@ public class JsonObject {
 	public static final int LINE_NOT_REQUIRED = -1;
 	public static final int STRING_LINE_INDEFINITE = -2;
 	File jsonFile;
-	String jsonFilePath;
+	Path jsonFilePath;
+	String[] contentOfJson;
 	public JsonElement parsedJson = new JsonElement("19491001","jianguo");
-	public JsonObject(String path) {
+	public JsonObject(Path path) {
 		jsonFilePath = path;
-		jsonFile = new File(path);
+		jsonFile = path.toFile();
 	}
 	public JsonObject(File jsonObjectFile) {
 		jsonFile = jsonObjectFile;
-		jsonFilePath = jsonObjectFile.getPath();
+		jsonFilePath = jsonObjectFile.toPath();
+	}
+	public JsonObject(String... jsons) {
+		contentOfJson = jsons;
 	}
 	public void parse() throws IOException {
 		//retrieving parsed String
-		System.out.println("\u001B[30m\u001B[47mJsonObject.java | parse()  :  Parsing Started\u001B[0m\u001B[0m");
 		ArrayList<String> contents = new ArrayList<>();
-		BufferedReader BuffjsonReader = new BufferedReader(new FileReader(jsonFile));
-		String inputString;
-		while((inputString = BuffjsonReader.readLine()) != null) {
-			contents.add(inputString);
-			System.out.println("\u001B[32mJsonObject.java | parse()  :  JSON file contents: " + inputString + "\u001B[0m");
+		try {
+			BufferedReader BuffjsonReader = new BufferedReader(new FileReader(jsonFile));
+			String inputString;
+			while((inputString = BuffjsonReader.readLine()) != null) {
+				contents.add(inputString);
+			}
+			BuffjsonReader.close();
+		} catch (Exception e) {
+			for (String i : contentOfJson) {
+				contents.add(i);
+			}
 		}
-		BuffjsonReader.close();
 		ArrayList<String> jsonSectionAddress = new ArrayList<>();
 		//starts Line by Line, Character by Character parsing
 		ArrayList<JsonElement> ConstructRAM = new ArrayList<>();
 		for (int lineindex = 0; lineindex < contents.size(); lineindex++) {
 			String line = contents.get(lineindex);
 			for (int CharIndex = 0; CharIndex < line.length(); CharIndex++ ) {
-				System.out.println("\u001B[33mJsonObject.java | parse()  :  Proccessing Char: " + line.charAt(CharIndex) + "\u001B[0m");
 				char character = line.charAt(CharIndex);
 				
 				//check 
@@ -58,13 +66,17 @@ public class JsonObject {
 				switch (character) {
 				case '{':
 					try {
-						System.out.println(ConstructRAM.get(0).strValue);
 						JsonElement section = new JsonElement(ConstructRAM.get(0).strValue, JsonElement.type.Sec);
 						director(section, jsonSectionAddress);
 						jsonSectionAddress.add(section.toString());
 						ConstructRAM.clear();
 					} catch (Exception e) {
-						JsonElement section = new JsonElement(jsonFile.getName(),JsonElement.type.Sec);
+						JsonElement section = new JsonElement("Nameless Section", JsonElement.type.Sec);
+						try {
+						section = new JsonElement(jsonFile.getName(),JsonElement.type.Sec);
+						} catch (Exception e2) {
+							
+						}
 						if (parsedJson.Name.equals("19491001") || parsedJson.strValue == "jianguo") {
 							parsedJson = section;
 						} else {
@@ -85,8 +97,6 @@ public class JsonObject {
 					break;
 				case '[':
 					try {
-						System.out.println("JsonObject.java | (hidden) director(JsonElement directed, ArrayList<String> address)  :  Address: " + jsonSectionAddress);
-						System.out.println(ConstructRAM.get(0).strValue);
 						JsonElement section = new JsonElement(ConstructRAM.get(0).strValue, JsonElement.type.Arr);
 						director(section, jsonSectionAddress);
 						jsonSectionAddress.add(section.toString());
@@ -96,7 +106,6 @@ public class JsonObject {
 						director(section, jsonSectionAddress);
 						jsonSectionAddress.add(section.toString());
 					}
-					System.out.println("JsonObject.java | (hidden) director(JsonElement directed, ArrayList<String> address)  :  Address: " + jsonSectionAddress);
 					break;
 				}
 				if (Character.isDigit(character) || character == '-') {
@@ -108,7 +117,6 @@ public class JsonObject {
 				case '}':
 					if (ConstructRAM.size() != 0) {
 						JsonElement element = construct(ConstructRAM, line, CharIndex);
-						System.out.println("\u001B[34mJsonObject.java | parse()  :  Constructed JsonElement Object: " + element.getTagValue() + "\u001B[0m");
 						director(element, jsonSectionAddress);
 						ConstructRAM.clear();
 					}
@@ -116,14 +124,12 @@ public class JsonObject {
 					break;
 				case ',':
 					JsonElement element = construct(ConstructRAM, line, CharIndex);
-					System.out.println("\u001B[34mJsonObject.java | parse()  :  Constructed JsonElement Object: " + element.getTagValue() + "\u001B[0m");
 					director(element, jsonSectionAddress);
 					ConstructRAM.clear();
 					break;
 				case ']':
 					if (ConstructRAM.size() != 0) {
 						JsonElement arr = construct(ConstructRAM, line, CharIndex);
-						System.out.println("\u001B[34mJsonObject.java | parse()  :  Constructed JsonElement Object: " + arr.getTagValue() + "\u001B[0m");
 						director(arr, jsonSectionAddress);
 						ConstructRAM.clear();
 					}
@@ -136,14 +142,11 @@ public class JsonObject {
 	private void director(JsonElement directed, ArrayList<String> address) {
 		//section code
 		if (directed.Name != "PLACEHOLDER - ZTAMCJWGRQ" && directed.numValue != 19491001) {
-			System.out.println(directed.toString());
-			System.out.println("JsonObject.java | (hidden) director(JsonElement directed, ArrayList<String> address)  :  Address: " + address);
 			parsedJson.deepIDSearch(address).secValue.add(directed);
 		}
 	}
 	private JsonElement construct(ArrayList<JsonElement> ConstructInfo, String line, int CharIndex) { // CONSTRUCTS BASIC ELEMENTS
 		try {
-			System.out.println("JsonObject.java | (hidden) construct(ArrayList<JsonElement> ConstructInfo, String line, int CharIndex)  :  Constructing Object From RAM");
 			switch (ConstructInfo.get(ConstructInfo.size() - 1).ElementType) {
 			case Str :
 				if (ConstructInfo.size() != 1 ) {
